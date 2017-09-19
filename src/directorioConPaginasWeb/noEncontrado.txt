@@ -1,0 +1,7 @@
+<head>\n
+<meta charset=\"UTF-8\">\n"
+</head>\n
+<body>\n
+<header> <h1>404. Página no encontrada.</h1> </header>\n
+Por: Gibran Raydan, Andres Galeano.
+</html>);
