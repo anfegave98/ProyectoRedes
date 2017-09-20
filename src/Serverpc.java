@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
+
 public class Serverpc {
 
     /**
@@ -54,28 +55,44 @@ public class Serverpc {
                 String f = out2[0];
                 System.out.println("Parametro :" + f);
 
-                int condicion = process(f);
-                System.out.println("condicion :" + condicion);
-
-                
-                
-              //necesito abrir este puto HTML
-                String paginaHTML = "<HTML>\n"
-                        + "<HEAD>\n"
-                        + "<TITLE>Hello World in HTML</TITLE>\n"
-                        + "</HEAD>\n"
-                        + "<BODY>\n"
-                        + "<CENTER><H1>Hello World!</H1></CENTER>\n"
-                        + "</BODY>\n"
-                        + "</HTML>";
-                
-               
-             
-                String response = "HTTP/1.1 200 OK \n \n" + paginaHTML; 
-                
-                output.flush();//vacia contenido
-                output.println(response);
-                clientSocket.close();
+                String pagina = process(f);
+                System.out.println("condicion :" + pagina);
+                String paginaHTML;
+                //necesito abrir este puto HTML
+                if (pagina.equals("")) {
+                    paginaHTML
+                            = "HTTP/1.1 200 OK\n\n"
+                            +  "<html>\n"
+                                + "<head>\n"
+                                + "<meta charset=\\\"UTF-8\\\">\n"
+                                + "</head>\n"
+                                + "<body>\n"
+                                + "<header> <h1>404 pagina no encontrada</h1> </header>\n"
+                                + "Por: Gibran Raydan, Andres Galeano. ;(\n"
+                                + "</html>";
+                    output.flush();//vacia contenido
+                    output.println(paginaHTML);
+                    clientSocket.close();
+                } else {
+                    if (pagina.equals("noEncontrado")) {
+                        pagina = "HTTP/1.1 200 OK\n\n"+
+                                "<html>\n"
+                                + "<head>\n"
+                                + "<meta charset=\\\"UTF-8\\\">\n"
+                                + "</head>\n"
+                                + "<body>\n"
+                                + "<header> <h1>Esta pagina ha sido bloqueada</h1> </header>\n"
+                                + "Por: Gibran Raydan, Andres Galeano. ;(\n"
+                                + "</html>";
+                        output.flush();//vacia contenido
+                        output.println(pagina);
+                        clientSocket.close();
+                    } else {
+                        output.flush();//vacia contenido
+                        output.println(pagina);
+                        clientSocket.close();
+                    }
+                }
             }
         } catch (IOException ex) {
             System.err.println(ex.getMessage());
@@ -88,18 +105,18 @@ public class Serverpc {
      * @param request peticion del cliente
      * @return int
      */
-    public static int process(String f) throws FileNotFoundException, IOException {
+    public static String process(String f) throws FileNotFoundException, IOException {
         if (f != null) {
             if (f.equals("hello")) {
-                return 1;
+                return retornarPagina(f);
             } else {
                 if (f.equals("redes")) {
-                    return 2;
+                    return retornarPagina(f);
                 } else {
                     if (f.equals("image")) {
-                        return 3;
+                        return retornarPagina(f);
                     } else {
-                        File archivo_texto = new File("C:\\Users\\Gibran\\Documents\\NetBeansProjects\\serverpc\\src\\archivoDePalabras.txt");
+                        File archivo_texto = new File("C:\\Users\\FiJus\\Downloads\\serverpc\\src\\archivoDePalabras.txt");
                         Scanner sc = new Scanner(archivo_texto);
                         String linea;
                         boolean aux = false;
@@ -112,7 +129,7 @@ public class Serverpc {
                         }
                         if (aux == true) {
                             System.out.println("palabra fea");
-                            return 4;
+                            return "noEncontrado";
                         }
                     }
                 }
@@ -120,10 +137,30 @@ public class Serverpc {
 
         } else {
             System.out.println("No hay parametros");
-
+            return retornarPagina("blabla");
         }
-        return 0;
+        return "";
+    }
 
+    public static String retornarPagina(String pagina) {
+        try {
+            File file = new File("C:/Users/FiJus/Downloads/serverpc/src/directorioConPaginasWeb" + "/" + pagina + ".html");
+            Scanner sc = new Scanner(file);
+            StringBuffer page = new StringBuffer("");
+            int f = 0;
+            while (sc.hasNextLine()) {
+                if (f == 0) {
+                    page.append("HTTP/1.1 200 OK\n\n");
+                    f = 1;
+                } else {
+                    page.append(sc.nextLine()).append("\n");
+
+                }
+            }
+            return page.toString();
+        } catch (FileNotFoundException ex) {
+            return "";
+        }
     }
 
 }
