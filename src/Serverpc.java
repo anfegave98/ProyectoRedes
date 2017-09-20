@@ -21,9 +21,22 @@ public class Serverpc {
 
     /**
      * @param args the command line arguments
+     * 
      */
+        static String archivo = "";
+        static String directorio = "";
     public static void main(String[] args) throws FileNotFoundException, IOException {
-
+        
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-a")) {
+                 archivo = args[i + 1];
+            } else {
+                if (args[i].equals("-d")) {
+                    directorio = args[i + 1];
+                }
+            }
+        }
+        
         try {
             //Socket de servidor para esperar peticiones de la red
             ServerSocket serverSocket = new ServerSocket(PORT);
@@ -58,7 +71,7 @@ public class Serverpc {
                 String pagina = process(f);
                 System.out.println("condicion :" + pagina);
                 String paginaHTML;
-                //necesito abrir este puto HTML
+                
                 if (pagina.equals("")) {
                     paginaHTML
                             = "HTTP/1.1 200 OK\n\n"
@@ -116,7 +129,7 @@ public class Serverpc {
                     if (f.equals("image")) {
                         return retornarPagina(f);
                     } else {
-                        File archivo_texto = new File("C:\\Users\\FiJus\\Downloads\\serverpc\\src\\archivoDePalabras.txt");
+                        File archivo_texto = new File(archivo);
                         Scanner sc = new Scanner(archivo_texto);
                         String linea;
                         boolean aux = false;
@@ -144,7 +157,7 @@ public class Serverpc {
 
     public static String retornarPagina(String pagina) {
         try {
-            File file = new File("C:/Users/FiJus/Downloads/serverpc/src/directorioConPaginasWeb" + "/" + pagina + ".html");
+            File file = new File( directorio + "/" + pagina + ".html");
             Scanner sc = new Scanner(file);
             StringBuffer page = new StringBuffer("");
             int f = 0;
